@@ -1,0 +1,28 @@
+version: '3.12'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/code
+
+  db:
+    image: postgres:14.3-alpine3.15
+    ports:
+      - '5431:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: db
+
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - '6379:6379'
