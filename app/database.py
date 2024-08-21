@@ -1,34 +1,33 @@
+import os
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 metadata = MetaData()
+load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:1234@localhost:5431/db"
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
+# SQLALCHEMY_DATABASE_URL = "postgresql://postgres:1234@localhost:5431/db"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
+engine = create_async_engine(
+    SQLALCHEMY_DATABASE_URL,
+    echo=True,
 )
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Создание асинхронного SessionLocal
+SessionLocal = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
 
 Base = declarative_base()
 
 
-
-
-# class User(Base):
-#     __tablename__ = "users"
-#
-#     id = Column(Integer, primary_key=True, index=True)
-#     username = Column(String, unique=True, index=True)
-#     email = Column(String, unique=True, index=True)
-#     password_hash = Column(String)
-#     is_active = Column(Boolean)
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
