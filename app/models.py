@@ -14,7 +14,7 @@ class Sname(Base):
     status = Column(Integer, unique=False, nullable=False)
 
 class Lname(Base):
-    __tablename__ = "long_names"
+    __tablename__ = "full_names"
 
     name = Column(String, primary_key=True, index=True)
     status = Column(Integer, unique=False, nullable=True)
